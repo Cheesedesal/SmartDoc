@@ -1,0 +1,303 @@
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Poppins',sans-serif;
+}
+
+:root{
+    --green:#0F5810;
+    --green2:#4E8F42;
+    --yellow:#F3DC16;
+    --bg:#EEF4EE;
+}
+
+body{
+    background:var(--bg);
+}
+
+/* SIDEBAR */
+
+.sidebar{
+    position:fixed;
+    top:0;
+    left:0;
+    width:260px;
+    height:100vh;
+    background:var(--green);
+    color:white;
+}
+
+.logo{
+    text-align:center;
+    padding:30px 20px 25px;
+}
+
+.logo img{
+    width:80px;
+    height:80px;
+    object-fit:contain;
+}
+
+.logo h2{
+    margin-top:10px;
+    font-size:26px;
+}
+
+.logo p{
+    font-size:13px;
+    opacity:.8;
+    margin-top:3px;
+}
+
+.sidebar ul{
+    list-style:none;
+    padding:0;
+    margin-top:10px;
+}
+
+.sidebar li{
+    margin:5px 15px;
+}
+
+.sidebar a{
+    display:block;
+    padding:13px 18px;
+    color:white;
+    text-decoration:none;
+    border-radius:10px;
+    font-size:14px;
+    transition:.2s;
+}
+
+.sidebar a:hover{
+    background:var(--yellow);
+    color:var(--green);
+}
+
+/* MAIN */
+
+.main{
+    margin-left:260px;
+    padding:35px;
+}
+
+/* FORM CARD */
+
+.card{
+    background:white;
+    padding:25px;
+    border-radius:15px;
+    margin-top:30px;
+    box-shadow:0 5px 15px rgba(0,0,0,.08);
+}
+
+
+
+.user-form{
+    display:flex;
+    gap:15px;
+    align-items:center;
+    width:100%;
+    margin:0;
+}
+
+.user-form input,
+.user-form select{
+    width:300px;
+    min-width:300px;
+    max-width:300px;
+    height:43px;
+    padding:12px;
+    border:1px solid #ccc;
+    border-radius:8px;
+    background:white;
+}
+
+input:focus,
+select:focus{
+    outline:none;
+    border-color:var(--green);
+    box-shadow:0 0 0 2px rgba(15,88,16,.12);
+}
+
+/* BUTTON */
+
+button{
+    padding:11px 18px;
+    border:none;
+    border-radius:8px;
+    background:var(--green);
+    color:white;
+    cursor:pointer;
+    font-family:'Poppins',sans-serif;
+}
+
+button:hover{
+    background:var(--green2);
+}
+
+/* ADD BUTTON */
+
+.user-form button.add{
+    width:180px;
+    min-width:180px;
+    max-width:180px;
+    height:43px;
+    padding:10px 20px;
+    background:var(--yellow);
+    color:var(--green);
+    font-weight:600;
+    flex:0 0 180px;
+    white-space:nowrap;
+}
+
+.user-form button.add:hover{
+    background:#E6D000;
+}
+
+/* UPDATE BUTTON */
+
+.user-form button.update{
+    width:180px;
+    min-width:180px;
+    max-width:180px;
+    height:43px;
+    padding:10px 20px;
+    background:var(--green);
+    color:white;
+    font-weight:600;
+    flex:0 0 180px;
+    white-space:nowrap;
+}
+
+.user-form button.update:hover{
+    background:var(--green2);
+}
+
+/* TABLE */
+
+.table{
+    width:100%;
+    margin-top:30px;
+    background:white;
+    border-radius:15px;
+    box-shadow:0 5px 15px rgba(0,0,0,.08);
+    overflow:hidden;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+th{
+    background:var(--green);
+    color:white;
+    padding:12px;
+    text-align:center;
+}
+
+td{
+    padding:12px;
+    border-bottom:1px solid #ddd;
+    text-align:center;
+}
+
+/* ACTION BUTTONS */
+
+td:last-child{
+    white-space:nowrap;
+}
+
+td:last-child a{
+    display:inline-block;
+    text-decoration:none;
+    vertical-align:middle;
+}
+
+td:last-child button{
+    display:block;
+    padding:7px 12px;
+    margin:0;
+}
+
+/* EDIT */
+
+.edit{
+    background:#3498DB;
+}
+
+.edit:hover{
+    background:#2980B9;
+}
+
+/* DELETE */
+
+.delete{
+    background:#ff0000;
+}
+
+.delete:hover{
+    background:#D90000;
+}
+
+.status{
+    padding:6px 12px;
+    border-radius:20px;
+    font-size:13px;
+    font-weight:600;
+}
+
+.active{
+    background:#D8F5D2;
+    color:#0F5810;
+}
+
+.inactive{
+    background:#FFD6D6;
+    color:#9B0000;
+}
+
+/* RESPONSIVE */
+
+@media(max-width:1000px){
+    .sidebar{
+        width:220px;
+    }
+
+    .main{
+        margin-left:220px;
+    }
+}
+
+@media(max-width:700px){
+    .sidebar{
+        position:relative;
+        width:100%;
+        height:auto;
+    }
+
+    .main{
+        margin-left:0;
+        padding:20px;
+    }
+
+    .user-form{
+        flex-direction:column;
+        align-items:stretch;
+    }
+
+    .user-form input,
+    .user-form button.add,
+    .user-form button.update{
+        width:100%;
+        min-width:100%;
+        max-width:100%;
+        flex:1;
+    }
+
+    .table{
+        overflow-x:auto;
+    }
+}

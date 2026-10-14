@@ -1,0 +1,338 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+:root {
+    --green: #0F5810;
+    --green2: #4E8F42;
+    --yellow: #F3DC16;
+    --bg: #EEF4EE;
+}
+
+body {
+    background: var(--bg);
+    color: #111;
+}
+
+/* =========================
+   MAIN
+========================= */
+
+.main {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 35px;
+}
+
+/* =========================
+   HEADER
+========================= */
+
+.header {
+    margin-bottom: 25px;
+}
+
+.header h1 {
+    color: var(--green);
+    font-size: 30px;
+    margin-bottom: 5px;
+}
+
+.header p {
+    color: #666;
+    font-size: 14px;
+}
+
+/* =========================
+   BOX
+========================= */
+
+.box {
+    background: white;
+    padding: 25px;
+    border-radius: 15px;
+    margin-top: 25px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, .08);
+}
+
+.box h2 {
+    color: var(--green);
+    margin-bottom: 15px;
+    font-size: 22px;
+}
+
+.box h3 {
+    color: var(--green);
+    margin-bottom: 10px;
+}
+
+.box > p {
+    color: #555;
+    margin-bottom: 7px;
+}
+
+/* =========================
+   SELECTED DOCUMENT
+========================= */
+
+.document-info {
+    display: flex;
+    gap: 30px;
+    margin-top: 15px;
+}
+
+.document-info p {
+    color: #555;
+}
+
+/* =========================
+   FORM
+========================= */
+
+.form-row {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+    align-items: center;
+    width: 100%;
+}
+
+/* Make ALL form controls equal width */
+.form-row input,
+.form-row select {
+    height: 43px;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background: white;
+
+    flex: 1 1 0;
+    min-width: 0;
+    width: 0;
+}
+
+.form-row input:focus,
+.form-row select:focus {
+    outline: none;
+    border-color: var(--green);
+    box-shadow: 0 0 0 2px rgba(15, 88, 16, .12);
+}
+
+/* =========================
+   FORM BUTTON
+========================= */
+
+.form-row button {
+    height: 43px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+
+    background: var(--yellow);
+    color: var(--green);
+
+    font-weight: 600;
+    cursor: pointer;
+
+    flex: 0 0 180px;
+    white-space: nowrap;
+}
+
+.form-row button:hover {
+    background: #E6D000;
+}
+
+/* =========================
+   UPDATE BUTTON
+========================= */
+
+.form-row button[name="update_r_button"],
+.form-row button[name="update_p_button"] {
+    background: var(--green);
+    color: white;
+}
+
+.form-row button[name="update_r_button"]:hover,
+.form-row button[name="update_p_button"]:hover {
+    background: var(--green2);
+}
+
+/* =========================
+   TABLE
+========================= */
+
+.table {
+    width: 100%;
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th {
+    background: var(--green);
+    color: white;
+    padding: 12px;
+    text-align: center;
+    white-space: nowrap;
+}
+
+td {
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+    text-align: center;
+    vertical-align: middle;
+}
+
+/* =========================
+   ACTION BUTTONS
+========================= */
+
+.action {
+    white-space: nowrap;
+}
+
+.action a {
+    display: inline-block;
+    text-decoration: none;
+    vertical-align: middle;
+}
+
+.action button {
+    display: block;
+    padding: 7px 12px;
+    margin: 0;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    cursor: pointer;
+}
+
+/* EDIT */
+
+.edit {
+    background: #3498DB;
+}
+
+.edit:hover {
+    background: #2980B9;
+}
+
+/* DELETE */
+
+.delete {
+    background: #ff0000;
+}
+
+.delete:hover {
+    background: #D90000;
+}
+
+/* =========================
+   STATUS
+========================= */
+
+.status {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.required {
+    background: #FFE8E8;
+    color: #B00000;
+}
+
+.optional {
+    background: #FFF3B0;
+    color: #806900;
+}
+
+/* =========================
+   EMPTY TABLE
+========================= */
+
+table td[colspan] {
+    color: #777;
+    padding: 20px;
+}
+
+/* =========================
+   BACK BUTTON
+========================= */
+
+.main > a {
+    display: inline-block;
+    margin-top: 25px;
+    text-decoration: none;
+}
+
+.main > a button {
+    padding: 11px 18px;
+    border: none;
+    border-radius: 8px;
+    background: var(--green);
+    color: white;
+    cursor: pointer;
+}
+
+.main > a button:hover {
+    background: var(--green2);
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 1000px) {
+
+    .main {
+        padding: 25px;
+    }
+
+    .form-row {
+        flex-wrap: wrap;
+    }
+
+    .form-row input,
+    .form-row select {
+        min-width: 200px;
+        width: auto;
+    }
+
+}
+
+@media (max-width: 700px) {
+
+    .main {
+        padding: 15px;
+    }
+
+    .box {
+        padding: 18px;
+    }
+
+    .form-row {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .form-row input,
+    .form-row select {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .form-row button {
+        width: 100%;
+        flex: none;
+    }
+
+}
