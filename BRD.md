@@ -68,7 +68,7 @@ Status key (current implementation): **Implemented** = code present; **Schema on
 
 ## 6. Out-of-scope features
 
-No scope decision has been recorded. The following are **not present** in the code and are *not* assumed in scope: self-registration, password reset, email verification, payment processing, public API, AI-assisted features. **Needs confirmation.**
+No scope decision has been recorded for future work, but this project now explicitly approved the following in-scope behavior for this implementation phase: public self-registration for student accounts only, with new accounts created as `pending` until an administrator approves and activates them. The following remain out of scope unless separately approved: password reset, email verification, payment processing, public API, AI-assisted features.
 
 ## 7. User roles and responsibilities
 
@@ -80,7 +80,9 @@ Roles **[C]** (`App\Enums\Role`): `student`, `staff`, `admin`.
 | Staff | Sees non-completed/non-rejected request queue (all students) | Review, process, verify, reject, release requests; message students |
 | Admin | Sees system totals (users, students, staff, active users, departments, document types) | Manage users, departments, document types, announcements |
 
-User attributes **[C]**: `school_id`, `firstname`, `surname`, `email`, `department_id`, `course`, `year`, `section`, `position`, `role`, `status` (`activated` / `deactivated`).
+User attributes **[C]**: `school_id`, `firstname`, `surname`, `email`, `department_id`, `course`, `year`, `section`, `position`, `role`, `status` (`pending`, `activated`, `deactivated`).
+
+Public self-registration is approved for student accounts only. Newly registered student accounts are created in `pending` status and cannot log in until an administrator changes their status to `activated`. Public registration may never assign `role=admin` or a privileged `status` value.
 
 Whether staff are scoped to departments or can see all requests: **Needs confirmation** (dashboard currently shows all open requests to all staff).
 
