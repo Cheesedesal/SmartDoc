@@ -63,12 +63,15 @@ Status key (current implementation): **Implemented** = code present; **Schema on
 | User management | [I] | Schema + model only |
 | Announcement management | [I] | Schema + model only |
 | Student–staff messaging | [I] | Schema + model only |
-| Account settings, request records, student records | [I] (legacy CSS names only) | None |
+| Account settings | [I] (legacy CSS name only; `accountsettings.css` is the only legacy asset without a Laravel page) | Implemented (Batch 4, 2026-10-18) at `/account-settings` for every role, own account only. **CODE REVIEWED, NOT RUN**: tests are written but no PHP syntax check, test run, route list, frontend build, browser check or MySQL check has been executed |
+| Request records (read-only history) | [I] (legacy CSS name; reference inspected) | Implemented (Batch 2); automated tests and syntax check pass (2026-10-18); browser visual check and MySQL run still pending |
+| Request reports (printable page + CSV export) | [I] (reference `requestreport.php` inspected 2026-10-18) | Implemented (Batch 3) at `/request-reports` and `/request-reports/export` (staff/admin only, read-only). Automated tests are written but **not yet run**; PHP syntax check, route list, `npm run build`, browser visual check and MySQL run are all **not run** |
+| Student records | [I] (legacy CSS name only) | **Excluded** — page removed per owner instruction; not restored |
 | Legacy data import | [C] | Command exists; not runnable as configured (see `progress.md`) |
 
 ## 6. Out-of-scope features
 
-No scope decision has been recorded. The following are **not present** in the code and are *not* assumed in scope: self-registration, password reset, email verification, payment processing, public API, AI-assisted features. **Needs confirmation.**
+No scope decision has been recorded for future work, but this project now explicitly approved the following in-scope behavior for this implementation phase: public self-registration for student accounts only, with new accounts created as `pending` until an administrator approves and activates them. The following remain out of scope unless separately approved: password reset, email verification, payment processing, public API, AI-assisted features.
 
 ## 7. User roles and responsibilities
 
@@ -80,7 +83,9 @@ Roles **[C]** (`App\Enums\Role`): `student`, `staff`, `admin`.
 | Staff | Sees non-completed/non-rejected request queue (all students) | Review, process, verify, reject, release requests; message students |
 | Admin | Sees system totals (users, students, staff, active users, departments, document types) | Manage users, departments, document types, announcements |
 
-User attributes **[C]**: `school_id`, `firstname`, `surname`, `email`, `department_id`, `course`, `year`, `section`, `position`, `role`, `status` (`activated` / `deactivated`).
+User attributes **[C]**: `school_id`, `firstname`, `surname`, `email`, `department_id`, `course`, `year`, `section`, `position`, `role`, `status` (`pending`, `activated`, `deactivated`).
+
+Public self-registration is approved for student accounts only. Newly registered student accounts are created in `pending` status and cannot log in until an administrator changes their status to `activated`. Public registration may never assign `role=admin` or a privileged `status` value.
 
 Whether staff are scoped to departments or can see all requests: **Needs confirmation** (dashboard currently shows all open requests to all staff).
 
@@ -113,8 +118,8 @@ Columns: **Current state** = what the code does today. **Req. status** = whether
 | FR-021 | Admin can create, edit, activate/deactivate users and assign role/department. | [I] | Not implemented |
 | FR-022 | Admin can create announcements (title, message, audience, status, publish/expiry dates). | [I] | Not implemented |
 | FR-023 | A student and a staff member can exchange messages. | [I] | Not implemented |
-| FR-024 | Users can update their own account settings. | [I] (legacy CSS name only) | Not implemented |
-| FR-025 | Staff/admin can view request records and student records. | [I] (legacy CSS names only) | Not implemented |
+| FR-024 | Users can update their own account settings. | [I] (legacy CSS name only) | **Implemented (Batch 4), CODE REVIEWED, NOT RUN.** `GET /account-settings` (read-only school ID, email, role, department), `PUT /account-settings/profile` (first name and surname for all roles; course, year, section for students only) and `PUT /account-settings/password` (current password required, new password at least 12 characters and different from the current one, throttled to 5 per minute). Email, school ID, role, status and department cannot be changed here. The editable-field scope is an assumption taken from the legacy stylesheet and the admin user screen, so it is still **Needs confirmation** from the owner. Tests: `tests/Feature/AccountSettingsTest.php` (not run) |
+| FR-025 | Staff/admin can view request records and student records. | [I] (legacy CSS names; reference app `requestrecords.php`/`studentrecords.php` inspected 2026-10-18) | **Split, not fully confirmed.** *Request records:* implemented as a read-only history page at `/request-records` (Completed + legacy Rejected requests; staff/admin only); automated tests and syntax check pass, browser visual check and MySQL run still pending. *Student records:* **excluded** — the owner's requirements call for that page to be removed, so it has not been restored; restoring it needs explicit owner authorization. The requirement as a whole remains **Needs confirmation**. |
 | FR-026 | Existing legacy data can be imported into the new schema. | [C] | Command exists; blocked (see `progress.md`) |
 | FR-027 | Self-registration. | Needs confirmation | None — **no route, controller, or view exists** |
 | FR-028 | Password reset. | Needs confirmation | None — `password_reset_tokens` table only; **no route, controller, or view exists** |
@@ -211,7 +216,7 @@ Current implementation: **neither registration nor password reset exists.**
 ## 15. Reporting and document-management requirements
 
 - Document types, per-type requirements, uploads, and verification: schema only [I].
-- Reporting: legacy CSS names `requestrecords` and `studentrecords` hint at record/report views; scope **Needs confirmation**. Legacy reports displayed "REQ-007"-style references [C comment].
+- Reporting: **request-record reports implemented (Batch 3)** as a port of the reference `requestreport.php`: a printable "Print / Save as PDF" page (`GET /request-reports`) and a CSV export (`GET /request-reports/export`), both limited to staff and admins, read-only, and driven by the same validated filters as the records page (search, document type, status, requested-date range) through `RequestRecordFilter`. Differences from the reference: students are denied (the reference only required a login); invalid filters redirect back to the records page instead of being passed to the query; the CSV adds a UTF-8 byte-order mark and neutralises spreadsheet formulas; the printable page adds summary counts and a by-document-type table that the reference page did not have (an extension, not a confirmed requirement: remove if unwanted). **Verification status (2026-10-18): tests written in `tests/Feature/RequestReportTest.php` but not yet run; syntax check, route list, frontend build, browser visual check and MySQL run not run.** The wider scope of reporting remains **Needs confirmation**; student records remain excluded. Legacy reports displayed "REQ-007"-style references [C comment].
 - Retention period for uploaded documents and records: Needs confirmation.
 
 ## 16. Assumptions, constraints, and dependencies

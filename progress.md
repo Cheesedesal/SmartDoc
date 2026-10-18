@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | Project | SmartDoc — document request system (Laravel 10), Bulacan Polytechnic College branding |
-| Last updated | 2026-10-14 |
+| Last updated | 2026-10-18 |
 | Basis | Read-only inspection plus verified Phase 1 validation in the isolated SQLite in-memory test database; no live MySQL writes or migration changes were made |
 | Related | `BRD.md` (requirements), `task.md` (work items) |
 
@@ -13,7 +13,7 @@ SmartDoc is being ported from a legacy plain-PHP application to Laravel. Today t
 
 ## 2. Current development status
 
-**Phase 1 completed for the route test and admin provisioning safeguards.** The root redirect expectation is now aligned with the route behavior, and the admin provisioning command has been reviewed and validated under the isolated SQLite in-memory test database. No migration files or live database records were modified.
+**Phase 1 and Phase 2 are complete for the route test, admin provisioning safeguards, and secure student registration flow.** The root redirect expectation is now aligned with the route behavior, the admin provisioning command is still non-destructive, and public student self-registration is implemented with a pending approval status before activation. No migration files or live database records were modified.
 
 ## 3. Status vocabulary
 
@@ -36,7 +36,11 @@ SmartDoc is being ported from a legacy plain-PHP application to Laravel. Today t
 Legend for "Evidence": **Code** = source inspected this session; **Test (unrun)** = test file exists but was not executed by me.
 
 ### 5.1 Completed
-None verified as `DONE`.
+
+| ID | Description | Status | Files | Evidence |
+|---|---|---|---|---|
+| PH-001 | Root redirect behavior and admin provisioning safeguards | DONE | `routes/web.php`, `tests/Feature/ExampleTest.php`, `app/Console/Commands/ProvisionAdmin.php`, `tests/Feature/AdminProvisionCommandTest.php` | Verified by `php artisan test` |
+| PH-003 | Public student registration with pending approval and protected role/status enforcement | DONE | `app/Http/Controllers/AuthController.php`, `routes/web.php`, `resources/views/auth/register.blade.php`, `app/Enums/UserStatus.php`, `tests/Feature/RegistrationTest.php` | Verified by `php artisan test` |
 
 ### 5.2 Implemented in code — awaiting verification
 
@@ -46,6 +50,12 @@ None verified as `DONE`.
 |---|---|---|---|---|---|
 | PH-001 | Root route redirects `/` to `/login` and the feature test reflects that behavior | DONE | `routes/web.php`, `tests/Feature/ExampleTest.php` | Verified by `php artisan test tests/Feature/ExampleTest.php tests/Feature/AdminProvisionCommandTest.php` | None |
 | PH-002 | Admin provisioning is explicit and non-destructive; existing accounts are not overwritten | DONE | `app/Console/Commands/ProvisionAdmin.php`, `app/Models/User.php`, `tests/Feature/AdminProvisionCommandTest.php` | Existing-account validation and unique `school_id`/`email` checks pass in tests | Keep future registration flows from assigning `admin` without explicit admin-only logic |
+
+#### Phase 2 checkpoint (2026-10-14)
+
+| ID | Description | Status | Files | Evidence | Remaining work |
+|---|---|---|---|---|---|
+| PH-003 | Public student registration is implemented with a pending approval status and role enforcement | DONE | `app/Http/Controllers/AuthController.php`, `routes/web.php`, `resources/views/auth/register.blade.php`, `app/Enums/UserStatus.php`, `tests/Feature/RegistrationTest.php` | Verified by `php artisan test` — 15 tests passed, 69 assertions | Add admin approval workflow and separate password reset in later phases |
 
 
 | ID | Description | Status | Files | Evidence | Remaining work |
@@ -136,8 +146,57 @@ Severity follows the P0–P3 scale. "Confirmed" = visible by reading code/config
 |---|---|
 | 2026-10-14 | Migration files dated 2026-10-14 define the SmartDoc schema (file names; actual authoring dates not verifiable). |
 | 2026-10-14 | Documentation baseline created: `BRD.md`, `progress.md`, `task.md`. No application code, config, `.env`, or database was modified. |
+| 2026-10-15 | Overhaul, backend slice (IN PROGRESS, **not executed**): additive migration `2026_10_15_000001` (payment, AI, archive columns + `request_ai_logs`); enums/models updated (Cancelled, PaymentStatus, legacy-only Rejected/Email); `config/smartdoc.php`; `RequestEvaluator`, `RequestAutomation`, `RequestLifecycle`, `SubmitDocumentRequest`, `RequestNotAllowedException`; `smartdoc:automate-requests` command scheduled every minute; `tests/Feature/RequestAutomationTest.php` (8 tests). Verification pending: `php -l`, `php artisan test` (SQLite in-memory) and `migrate:status` could not be run from the assistant session. Still TODO: form requests, student/staff controllers, routes, Blade views, role middleware, dashboard update (still counts `rejected`), page-load trigger middleware, removal of Rejected/Email from any UI. |
+| 2026-10-15 (2) | Overhaul, web slice (WRITTEN, **not executed**). Static review of the backend slice found and fixed one test bug (`document_requirements.description` is NOT NULL). Added: `role` middleware (`EnsureRole`, alias in `Http/Kernel.php`); `DocumentRequestPolicy` (view = owner or staff/admin; manage = owning student only); form requests `StoreDocumentRequestRequest`, `ResubmitPaymentRequest`, `CancelRequestRequest`, `OwnedRequestActionRequest`; controllers `StudentRequestController`, `StaffRequestController` (read-only), `RequestFileController` (private downloads); routes in `routes/web.php`; Blade `layouts/app`, `student/requests/{index,create,show}`, `staff/requests/{index,show}`, `pagination/smartdoc`; `dashboard.blade.php` now extends the layout; `DashboardController` no longer counts Rejected as open (new `open`, `cancelled`, `legacy_rejected` counts; staff recent list uses `open()` scope); sidebar made scrollable and request-workflow styles added in `resources/css/app.css`; page-load automation trigger is called only from the four request list/detail pages, throttled by `smartdoc.automation.tick_seconds`. New tests: `StudentRequestFlowTest` (13), `StaffRequestAccessTest` (9) in addition to `RequestAutomationTest` (8). **Not run:** `php -l`, `php artisan test`, `php artisan route:list`, `npm run build`, `migrate:status` (this session cannot execute commands on the project). Migration `2026_10_15_000001` has NOT been applied to MySQL; see the review notes in the final report. |
+| 2026-10-15 (3) | First real execution by the owner. `php artisan test`: 2 passed (`Unit\ExampleTest`, `Feature\ExampleTest`, neither touches a database), 37 failed, all with `QueryException: could not find driver (Connection: sqlite, SQL: PRAGMA foreign_keys = ON;)`. This is an environment problem (the PHP CLI has no `pdo_sqlite`), not evidence about the application code, which is therefore still **unverified**. The PHPUnit bootstrap did print `Verified PHPUnit database target: sqlite (:memory:)`, so no MySQL connection was attempted. `php artisan route:list` ran and shows the student and staff routes (21 lines pasted, header says 22; the `requests.payment-proof` route was not visible in the paste, so it is unconfirmed). `php -l` was not actually run (placeholder text was pasted as the command) and `npm run build` could not run (`npm.cmd` not on PATH in that shell). |
 
 Earlier history cannot be reconstructed: the repository has no commits. From `COMMIT_EDITMSG`, later edits (not yet committed) touched `Announcement`, `DocumentRequest`, `DocumentRequirement`, `DocumentType`, `UploadedRequirement`, `User`, the users migration, `app.css`, `welcome.blade.php`, and `routes/web.php`; new untracked files are the dashboard controller/view/test. This is inferred from a stale commit-template file, so treat it as indicative only.
+
+### Batch 3 — Reports (2026-10-18): automated checks PASS; browser and MySQL checks NOT RUN
+
+Port of reference `requestreport.php` (printable "Print / Save as PDF" page + CSV export of the request-record history). **Status: automated checks PASS (owner's run, 2026-10-18); browser and MySQL checks NOT RUN.** `RequestRecordsTest` (15) and `RequestReportTest` (20) pass, including the records-page report-links test, so the earlier `/request-records` HTTP 500 is resolved. Full suite: 127 passed (950 assertions). `npm run build` PASS. `php artisan route:list --name=request-reports` PASS (both routes listed). Details are in the Batch 4 results below, which came from the same run.
+
+| Item | Detail |
+|---|---|
+| Routes | `GET /request-reports` (`request-reports.show`), `GET /request-reports/export` (`request-reports.export`); `auth` + `role:staff,admin`; GET only |
+| Code | `RequestReportController` and `reports/request-records.blade.php` were already present (unrouted) from the earlier session and were reviewed, not rewritten; `RequestRecordFilter` is shared with the records page |
+| Changed this session | `routes/web.php` (two routes + import), `RequestReportController` (unused import removed; explicit `fputcsv` escape argument), `records/requests/index.blade.php` ("Generate Request Report" box), `resources/css/app.css` (`.report-box` styles), new `tests/Feature/RequestReportTest.php` (20 tests), `BRD.md` |
+| Differences from reference | Students denied; invalid filters redirect to the records page; CSV has BOM and formula neutralisation; printable page adds summary counts and a by-document-type table (extension, not in the reference) |
+| Database impact | None: no migrations, no schema change, no record writes (read-only queries) |
+| Not run | desktop (1440px) and mobile (390px) browser check, MySQL check, and `php -l` on `RequestRecordController`, `RequestReportController`, `RequestRecordFilter` and the two test files (PHPUnit loaded and executed them, but the `php -l` command itself was not run on them) |
+
+### Batch 4 — Account settings (2026-10-18): automated checks PASS; browser and MySQL checks NOT RUN
+
+**Selection basis.** `BRD.md`/`task.md` do not define a numbered "Batch 4", so the phase was chosen from the project itself: of the ten legacy stylesheets in `resources/css/legacy`, nine map to modules that now exist (dashboard, announcements, departments, document configure/management, request management, request records, user management) or are deliberately excluded (`studentrecords`); `accountsettings.css` was the only one with no Laravel page, no route and no sidebar link. Requirement: FR-024 / TASK-032 (`[I]`, Needs confirmation). Messaging, email mode, the rejection workflow, the student-records page and password reset were not touched (password reset is a different feature, FR-028).
+
+**Dependency on Batch 3.** None. Account settings does not use `RequestRecordFilter`, the report controller or the report views, so it does not rely on unverified Batch 3 behaviour. Batch 3's automated checks have since passed (see the Batch 3 section); its browser and MySQL checks are still outstanding.
+
+**Status: automated checks PASS (run by the owner, output pasted 2026-10-18); browser and MySQL checks NOT RUN.**
+
+Results, taken from the pasted output:
+
+| Check | Result |
+|---|---|
+| `php -l` | PASS for `AccountSettingsController.php`, `UpdateProfileRequest.php`, `AccountSettingsTest.php`, `routes/web.php`. For `UpdatePasswordRequest.php` the command appears in the paste with no output line, so that one `php -l` result is unconfirmed (the class was loaded and its rules exercised by passing tests) |
+| Targeted: `php artisan test tests/Feature/AccountSettingsTest.php tests/Feature/RequestRecordsTest.php tests/Feature/RequestReportTest.php` | PASS: 52 passed, 549 assertions (17 + 15 + 20; one report-test line is missing from the pasted listing but the total matches) |
+| Full suite: `php artisan test` | PASS: 127 passed, 950 assertions, 0 failed. Banner: `Verified PHPUnit database target: sqlite (:memory:)` |
+| `npm run build` | PASS (58 modules; `app-CqgW78fn.css` 19.98 kB) |
+| `php artisan route:list --name=request-reports` | PASS: `request-reports.show` and `request-reports.export` |
+| `php artisan route:list --name=account` | PASS: footer says 3 routes; the paste shows the two `PUT` routes and the `GET account.edit` line was cut from the paste (PHPUnit requested it successfully) |
+| 1440px / 390px browser check | NOT RUN |
+| MySQL check | NOT RUN (the tests used SQLite only) |
+
+| Item | Detail |
+|---|---|
+| Routes (all `auth`, every role) | `GET /account-settings` (`account.edit`), `PUT /account-settings/profile` (`account.profile`), `PUT /account-settings/password` (`account.password`, `throttle:5,1`) |
+| Behaviour | Read-only school ID, email, role, department; editable first name and surname (all roles) and course, year (1 to 10), section (students only); password change needs the current password, at least 12 characters (same as registration), different from the current one; `users.name` is kept in step with first name + surname; the remember-me token is rotated on a password change |
+| Safety | Only the signed-in user's own row is touched (no user id in any URL or field); email, school ID, role, status and department are never validated or accepted, so crafted requests cannot change them; staff and admin cannot store academic fields; the seeded administrator, whose surname is empty, can still save; request status and lifecycle are not touched; no staff status actions added |
+| Created | `app/Http/Controllers/AccountSettingsController.php`, `app/Http/Requests/UpdateProfileRequest.php`, `app/Http/Requests/UpdatePasswordRequest.php`, `resources/views/account/settings.blade.php`, `tests/Feature/AccountSettingsTest.php` (17 tests) |
+| Modified | `routes/web.php` (import + three routes), `resources/views/layouts/app.blade.php` (one sidebar link, "Account settings", all roles), `BRD.md`, `progress.md`, `task.md` |
+| Not changed | `resources/css/app.css` (existing `.panel`, `.field`, `.field-row`, `.adm-form-row` and `.field input[readonly]` styles are reused, so no frontend rebuild is needed for this batch), migrations, seeders, `.env`, database configuration, test guards |
+| Database impact | None: no migration, no schema change, no seeding. The only runtime write is the signed-in user's own `users` row |
+| Not run | 1440px and 390px browser check, MySQL check, `php -l` output for `UpdatePasswordRequest.php` (not shown in the paste) |
+| Known limits | Editable-field scope is an assumption (needs owner confirmation). Passwords are not blocked against common-password lists (length only, as at registration). Other devices' PHP sessions are not invalidated on a password change (no `AuthenticateSession` middleware in the web group); only remember-me tokens are rotated. The full suite passed with the new sidebar link, so no older test conflicts with it. |
 
 ## 11. Important decisions and reasons
 
