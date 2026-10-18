@@ -11,7 +11,7 @@ enum RequestStage: string
     case ReadyForRelease = 'Ready for Release';
     case Released = 'Released';
 
-    /** Legacy completeCurrentStage() transitions. */
+    /** Next stage in the automated lifecycle (driven by App\Services\RequestAutomation). */
     public function next(): ?self
     {
         return match ($this) {

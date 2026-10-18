@@ -28,10 +28,9 @@ class DashboardController extends Controller
         if ($role === Role::Student) {
             $requests->where('user_id', $user->id);
         } else {
-            $requests->whereNotIn('status', [
-                RequestStatus::Completed->value,
-                RequestStatus::Rejected->value,
-            ]);
+            // Staff/admin queue: only requests still being worked on. Completed, Cancelled and
+            // legacy Rejected rows are history, not queue items.
+            $requests->open();
         }
 
         $announcements = Announcement::visibleTo($role)
@@ -81,13 +80,20 @@ class DashboardController extends Controller
             ->groupBy('status')
             ->pluck('aggregate', 'status');
 
+        $pending = (int) ($counts[RequestStatus::Pending->value] ?? 0);
+        $inProgress = (int) ($counts[RequestStatus::InProgress->value] ?? 0);
+        $ready = (int) ($counts[RequestStatus::ReadyForPickup->value] ?? 0);
+
         return [
-            'total' => $counts->sum(),
-            'pending' => (int) ($counts[RequestStatus::Pending->value] ?? 0),
-            'in_progress' => (int) ($counts[RequestStatus::InProgress->value] ?? 0),
-            'ready_for_pickup' => (int) ($counts[RequestStatus::ReadyForPickup->value] ?? 0),
+            'total' => (int) $counts->sum(),
+            'open' => $pending + $inProgress + $ready,
+            'pending' => $pending,
+            'in_progress' => $inProgress,
+            'ready_for_pickup' => $ready,
             'completed' => (int) ($counts[RequestStatus::Completed->value] ?? 0),
-            'rejected' => (int) ($counts[RequestStatus::Rejected->value] ?? 0),
+            'cancelled' => (int) ($counts[RequestStatus::Cancelled->value] ?? 0),
+            // Legacy rows only: the rejection workflow no longer exists.
+            'legacy_rejected' => (int) ($counts[RequestStatus::Rejected->value] ?? 0),
         ];
     }
 }

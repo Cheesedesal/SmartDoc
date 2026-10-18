@@ -63,7 +63,9 @@ Status key (current implementation): **Implemented** = code present; **Schema on
 | User management | [I] | Schema + model only |
 | Announcement management | [I] | Schema + model only |
 | Student–staff messaging | [I] | Schema + model only |
-| Account settings, request records, student records | [I] (legacy CSS names only) | None |
+| Account settings | [I] (legacy CSS name only) | None |
+| Request records (read-only history) | [I] (legacy CSS name; reference inspected) | Implemented (Batch 2), awaiting verification run |
+| Student records | [I] (legacy CSS name only) | **Excluded** — page removed per owner instruction; not restored |
 | Legacy data import | [C] | Command exists; not runnable as configured (see `progress.md`) |
 
 ## 6. Out-of-scope features
@@ -114,7 +116,7 @@ Columns: **Current state** = what the code does today. **Req. status** = whether
 | FR-022 | Admin can create announcements (title, message, audience, status, publish/expiry dates). | [I] | Not implemented |
 | FR-023 | A student and a staff member can exchange messages. | [I] | Not implemented |
 | FR-024 | Users can update their own account settings. | [I] (legacy CSS name only) | Not implemented |
-| FR-025 | Staff/admin can view request records and student records. | [I] (legacy CSS names only) | Not implemented |
+| FR-025 | Staff/admin can view request records and student records. | [I] (legacy CSS names; reference app `requestrecords.php`/`studentrecords.php` inspected 2026-10-18) | **Split, not fully confirmed.** *Request records:* implemented as a read-only history page at `/request-records` (Completed + legacy Rejected requests; staff/admin only), awaiting verification run. *Student records:* **excluded** — the owner's requirements call for that page to be removed, so it has not been restored; restoring it needs explicit owner authorization. The requirement as a whole remains **Needs confirmation**. |
 | FR-026 | Existing legacy data can be imported into the new schema. | [C] | Command exists; blocked (see `progress.md`) |
 | FR-027 | Self-registration. | Needs confirmation | None — **no route, controller, or view exists** |
 | FR-028 | Password reset. | Needs confirmation | None — `password_reset_tokens` table only; **no route, controller, or view exists** |
@@ -211,7 +213,7 @@ Current implementation: **neither registration nor password reset exists.**
 ## 15. Reporting and document-management requirements
 
 - Document types, per-type requirements, uploads, and verification: schema only [I].
-- Reporting: legacy CSS names `requestrecords` and `studentrecords` hint at record/report views; scope **Needs confirmation**. Legacy reports displayed "REQ-007"-style references [C comment].
+- Reporting: legacy CSS names `requestrecords` and `studentrecords` hint at record/report views; scope **Needs confirmation**. The request-records page is implemented without the reference's PDF/CSV report buttons (reports are a later batch); student records remain excluded. Legacy reports displayed "REQ-007"-style references [C comment].
 - Retention period for uploaded documents and records: Needs confirmation.
 
 ## 16. Assumptions, constraints, and dependencies
