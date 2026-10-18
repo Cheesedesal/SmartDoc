@@ -26,6 +26,10 @@
         <img src="{{ asset('images/logo.png') }}" alt="Bulacan Polytechnic College Logo" class="logo">
         <h1>LOGIN</h1>
 
+        @if (session('status'))
+            <div class="error" style="background:#e6f7ea;color:#14532d;">{{ session('status') }}</div>
+        @endif
+
         <form method="POST" action="{{ route('login') }}" autocomplete="off">
             @csrf
             <label for="school_id">ID</label>
@@ -39,6 +43,10 @@
 
             <button type="submit">Login</button>
         </form>
+
+        <div class="meta">
+            <a href="{{ route('register') }}">Create a student account</a>
+        </div>
     </div>
 </body>
 </html>

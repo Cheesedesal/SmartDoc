@@ -13,7 +13,7 @@ SmartDoc is being ported from a legacy plain-PHP application to Laravel. Today t
 
 ## 2. Current development status
 
-**Phase 1 completed for the route test and admin provisioning safeguards.** The root redirect expectation is now aligned with the route behavior, and the admin provisioning command has been reviewed and validated under the isolated SQLite in-memory test database. No migration files or live database records were modified.
+**Phase 1 and Phase 2 are complete for the route test, admin provisioning safeguards, and secure student registration flow.** The root redirect expectation is now aligned with the route behavior, the admin provisioning command is still non-destructive, and public student self-registration is implemented with a pending approval status before activation. No migration files or live database records were modified.
 
 ## 3. Status vocabulary
 
@@ -36,7 +36,11 @@ SmartDoc is being ported from a legacy plain-PHP application to Laravel. Today t
 Legend for "Evidence": **Code** = source inspected this session; **Test (unrun)** = test file exists but was not executed by me.
 
 ### 5.1 Completed
-None verified as `DONE`.
+
+| ID | Description | Status | Files | Evidence |
+|---|---|---|---|---|
+| PH-001 | Root redirect behavior and admin provisioning safeguards | DONE | `routes/web.php`, `tests/Feature/ExampleTest.php`, `app/Console/Commands/ProvisionAdmin.php`, `tests/Feature/AdminProvisionCommandTest.php` | Verified by `php artisan test` |
+| PH-003 | Public student registration with pending approval and protected role/status enforcement | DONE | `app/Http/Controllers/AuthController.php`, `routes/web.php`, `resources/views/auth/register.blade.php`, `app/Enums/UserStatus.php`, `tests/Feature/RegistrationTest.php` | Verified by `php artisan test` |
 
 ### 5.2 Implemented in code — awaiting verification
 
@@ -46,6 +50,12 @@ None verified as `DONE`.
 |---|---|---|---|---|---|
 | PH-001 | Root route redirects `/` to `/login` and the feature test reflects that behavior | DONE | `routes/web.php`, `tests/Feature/ExampleTest.php` | Verified by `php artisan test tests/Feature/ExampleTest.php tests/Feature/AdminProvisionCommandTest.php` | None |
 | PH-002 | Admin provisioning is explicit and non-destructive; existing accounts are not overwritten | DONE | `app/Console/Commands/ProvisionAdmin.php`, `app/Models/User.php`, `tests/Feature/AdminProvisionCommandTest.php` | Existing-account validation and unique `school_id`/`email` checks pass in tests | Keep future registration flows from assigning `admin` without explicit admin-only logic |
+
+#### Phase 2 checkpoint (2026-10-14)
+
+| ID | Description | Status | Files | Evidence | Remaining work |
+|---|---|---|---|---|---|
+| PH-003 | Public student registration is implemented with a pending approval status and role enforcement | DONE | `app/Http/Controllers/AuthController.php`, `routes/web.php`, `resources/views/auth/register.blade.php`, `app/Enums/UserStatus.php`, `tests/Feature/RegistrationTest.php` | Verified by `php artisan test` — 15 tests passed, 69 assertions | Add admin approval workflow and separate password reset in later phases |
 
 
 | ID | Description | Status | Files | Evidence | Remaining work |

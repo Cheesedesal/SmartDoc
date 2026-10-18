@@ -3,7 +3,7 @@
 | Field | Value |
 |---|---|
 | Last updated | 2026-10-14 |
-| Basis | Phase 1 verification under the isolated SQLite in-memory test database; no live MySQL writes or migration changes were made |
+| Basis | Phase 1 and Phase 2 verification under the isolated SQLite in-memory test database; no live MySQL writes or migration changes were made |
 | Related | `BRD.md` (requirement IDs), `progress.md` (evidence and bug IDs) |
 
 **Conventions**
@@ -20,9 +20,10 @@
 |---|---|---|
 | 0 — Safety | Protect data, isolate tests, create rollback point | 001–004 |
 | 1 — Stabilise | Fix confirmed defects; get a trustworthy test baseline | 005–010 |
-| 2 — Confirm | Resolve BRD open questions | 020 |
-| 3 — Core features | Request workflow and admin modules | 021–031 |
-| 4 — Quality | Auth tests, authorization, UX, docs | 011, 040–045 |
+| 2 — Registration | Secure student-facing registration with pending approval | 016 |
+| 3 — Confirm | Resolve BRD open questions | 020 |
+| 4 — Core features | Request workflow and admin modules | 021–031 |
+| 5 — Quality | Auth tests, authorization, UX, docs | 011, 040–045 |
 
 ---
 
@@ -86,7 +87,13 @@
   - Description: After TASK-003, run the suite, diagnose the errors recorded for the student/admin dashboard tests, and update `ExampleTest` to expect the redirect from `/`. Remove or replace stock tests.
   - BRD: NFR-007 · Files: `tests/Feature/*.php`, `tests/Unit/ExampleTest.php` · Dependencies: TASK-003
   - Acceptance: All tests pass in the isolated environment; results recorded with date and command.
-  - Verification: `php artisan test tests/Feature/ExampleTest.php tests/Feature/AdminProvisionCommandTest.php` passed (3 tests, 25 assertions).
+  - Verification: `php artisan test` passed with 15 tests and 69 assertions.
+
+- [x] **TASK-016 — Implement secure student registration with pending approval** · P1 · DONE
+  - Description: Add a guest-only registration page and controller flow that creates only `student` accounts, validates uniqueness, hashes passwords, prevents role/status overrides, and blocks login while the user is pending approval.
+  - BRD: FR-001, FR-005, SEC-003 · Files: `app/Http/Controllers/AuthController.php`, `routes/web.php`, `resources/views/auth/register.blade.php`, `app/Enums/UserStatus.php`, `tests/Feature/RegistrationTest.php` · Dependencies: TASK-003, TASK-005
+  - Acceptance: Registration page works for guests, duplicates are rejected, role/status overrides are ignored, and pending users cannot log in until approved.
+  - Verification: `php artisan test tests/Feature/RegistrationTest.php tests/Feature/AdminProvisionCommandTest.php tests/Feature/ExampleTest.php` passed, and the full suite also passed under SQLite memory.
 
 - [ ] **TASK-011 — Add authentication tests** · P1 · TODO
   - Description: Cover activated login, wrong password, unknown ID, deactivated+correct password message, deactivated+wrong password generic message, throttle (429 on 6th), logout, guest redirects.
