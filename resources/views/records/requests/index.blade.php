@@ -17,6 +17,17 @@
         <div class="stat-card"><span class="stat-label">Rejected requests (legacy)</span><span class="stat-value">{{ $counts['rejected'] }}</span></div>
     </div>
 
+    <section class="panel report-box" aria-labelledby="report-heading">
+        <div class="report-info">
+            <h2 id="report-heading">Generate Request Report</h2>
+            <p>Create downloadable reports based on request history. Reports use the filters below.</p>
+        </div>
+        <div class="report-actions">
+            <a class="button" href="{{ route('request-reports.show', $reportQuery) }}" target="_blank" rel="noopener">Generate PDF Report</a>
+            <a class="button button-ghost" href="{{ route('request-reports.export', $reportQuery) }}">Export CSV</a>
+        </div>
+    </section>
+
     <section class="panel queue-panel">
         <form class="queue-filters records-filters" method="GET" action="{{ route('request-records.index') }}" role="search">
             <div class="field">

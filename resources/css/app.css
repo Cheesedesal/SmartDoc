@@ -334,6 +334,17 @@ a.count-pill:hover, a.count-pill:focus-visible { color: #fff; background: var(--
 .records-table td { white-space: nowrap; }
 .records-table td.queue-wide { white-space: normal; }
 
+/* Request report box on the records page (Batch 3). */
+.report-box { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-bottom: 20px; padding: 20px 22px; }
+.report-info h2 { margin: 0; color: var(--green); font-size: 16px; }
+.report-info p { margin: 5px 0 0; color: #666; font-size: 13px; }
+.report-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+@media (max-width: 680px) {
+    .report-box { flex-direction: column; align-items: stretch; text-align: center; }
+    .report-actions { flex-direction: column; }
+    .report-actions .button { width: 100%; text-align: center; }
+}
+
 @media (max-width: 1080px) {
     .records-filters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .stats-grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }

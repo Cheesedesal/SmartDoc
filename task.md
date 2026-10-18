@@ -2,7 +2,7 @@
 
 | Field | Value |
 |---|---|
-| Last updated | 2026-10-14 |
+| Last updated | 2026-10-18 |
 | Basis | Phase 1 and Phase 2 verification under the isolated SQLite in-memory test database; no live MySQL writes or migration changes were made |
 | Related | `BRD.md` (requirement IDs), `progress.md` (evidence and bug IDs) |
 
@@ -106,6 +106,12 @@
   - BRD: FR-010, BR-003–BR-008 · Files: new tests · Dependencies: TASK-003
   - Acceptance: Each rule has at least one passing test.
   - Verification: Run suite.
+
+- [ ] **TASK-046 — Run and record verification for Batch 3 (reports) and Batch 4 (account settings)** · P1 · TODO
+  - Description: Neither batch has been executed by the assistant (no command execution available). Run, in order: `php -l` on the new and changed PHP files, `php artisan test tests/Feature/RequestRecordsTest.php tests/Feature/RequestReportTest.php tests/Feature/AccountSettingsTest.php`, then `php artisan test`, `npm run build`, and `php artisan route:list --name=request-reports` plus `--name=account`. Then check `/request-records`, `/request-reports` and `/account-settings` at 1440px and 390px, and run the report and account queries once against MySQL (read-only for reports).
+  - BRD: NFR-007, FR-024, FR-025 · Files: none · Dependencies: TASK-003 (done)
+  - Acceptance: Each command's real output is pasted into `progress.md` with its date and PASS/FAIL; the full suite passes; browser and MySQL results are recorded or listed as NOT RUN.
+  - Verification: Test database stays SQLite `:memory:` (the PHPUnit bootstrap prints `Verified PHPUnit database target: sqlite (:memory:)`); no migration is run against the development database.
 
 ### Documentation and deployment
 
@@ -220,6 +226,7 @@ Features marked **NEEDS CONFIRMATION** come from schema/legacy evidence only; co
   - Acceptance: Only the two participants can read a thread. Verification: tests.
 
 - [ ] **TASK-032 — Account settings; request and student records** · P3 · NEEDS CONFIRMATION
+  - Status note (2026-10-18): the **account settings** part is implemented (Batch 4, `/account-settings`) and is CODE REVIEWED, NOT RUN; see TASK-046. The editable-field scope still needs owner confirmation. Request records (Batch 2) and request reports (Batch 3) are implemented separately. Student records stay **excluded** and must not be restored without explicit owner authorization.
   - BRD: FR-024, FR-025 · Dependencies: TASK-010, TASK-023
   - Acceptance: To be defined after TASK-020. Verification: To be defined.
 

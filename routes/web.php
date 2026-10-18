@@ -4,11 +4,13 @@ use App\Http\Controllers\Admin\AnnouncementManagementController;
 use App\Http\Controllers\Admin\DepartmentController;
 use App\Http\Controllers\Admin\DocumentTypeController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\AccountSettingsController;
 use App\Http\Controllers\AnnouncementController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\RequestFileController;
 use App\Http\Controllers\RequestRecordController;
+use App\Http\Controllers\RequestReportController;
 use App\Http\Controllers\StaffRequestController;
 use App\Http\Controllers\StudentRequestController;
 use Illuminate\Support\Facades\Route;
@@ -30,6 +32,13 @@ Route::middleware('auth')->group(function () {
 
     // Every role may read announcements; what each role sees is enforced in Announcement::visibleTo().
     Route::get('/announcements', [AnnouncementController::class, 'index'])->name('announcements.index');
+
+    // Account settings: every role, own account only (no user id in the URL or the form).
+    Route::get('/account-settings', [AccountSettingsController::class, 'edit'])->name('account.edit');
+    Route::put('/account-settings/profile', [AccountSettingsController::class, 'updateProfile'])->name('account.profile');
+    Route::put('/account-settings/password', [AccountSettingsController::class, 'updatePassword'])
+        ->middleware('throttle:5,1')
+        ->name('account.password');
 
     // Students: own requests only (ownership re-checked by DocumentRequestPolicy).
     Route::middleware('role:student')
@@ -59,6 +68,16 @@ Route::middleware('auth')->group(function () {
     Route::get('/request-records', [RequestRecordController::class, 'index'])
         ->middleware('role:staff,admin')
         ->name('request-records.index');
+
+    // Request record reports: printable page and CSV export (port of reference requestreport.php).
+    // Read-only, staff and admins; both endpoints validate the same filters as the records page.
+    Route::middleware('role:staff,admin')
+        ->prefix('request-reports')
+        ->name('request-reports.')
+        ->group(function () {
+            Route::get('/', [RequestReportController::class, 'show'])->name('show');
+            Route::get('/export', [RequestReportController::class, 'export'])->name('export');
+        });
 
     // Administration (port of the reference admin modules). Role-gated server-side; FormRequests re-check admin.
     Route::middleware('role:admin')

@@ -63,6 +63,10 @@
             <a class="nav-link {{ request()->routeIs('announcements.index') ? 'active' : '' }}" href="{{ route('announcements.index') }}" @if (request()->routeIs('announcements.index')) aria-current="page" @endif>
                 <span class="nav-icon" aria-hidden="true">◉</span>Announcements
             </a>
+
+            <a class="nav-link {{ request()->routeIs('account.*') ? 'active' : '' }}" href="{{ route('account.edit') }}" @if (request()->routeIs('account.*')) aria-current="page" @endif>
+                <span class="nav-icon" aria-hidden="true">⚙</span>Account settings
+            </a>
         </nav>
 
         <div class="sidebar-bottom">
