@@ -24,7 +24,7 @@
 <body>
     <div class="card">
         <img src="{{ asset('images/logo.png') }}" alt="Bulacan Polytechnic College Logo" class="logo">
-        <h1>LOGIN</h1>
+        <h1>SmartDoc</h1>
 
         <form method="POST" action="{{ route('login') }}" autocomplete="off">
             @csrf
@@ -39,6 +39,7 @@
 
             <button type="submit">Login</button>
         </form>
+        <p class="login-reset-link"><a href="{{ route('password.request') }}">Forgot password?</a></p>
     </div>
 </body>
 </html>

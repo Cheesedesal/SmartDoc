@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\UserStatus;
+use App\Models\ActivityLog;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -28,6 +29,13 @@ class AuthController extends Controller
         // but only after the password has been verified (no account enumeration).
         $user = User::where('school_id', $credentials['school_id'])->first();
 
+        if ($user && $user->archived_at !== null
+            && Hash::check($credentials['password'], $user->password)) {
+            return back()->withInput($request->only('school_id'))->withErrors([
+                'school_id' => 'This account is archived. Please contact an administrator.',
+            ]);
+        }
+
         if ($user && $user->status === UserStatus::Deactivated
             && Hash::check($credentials['password'], $user->password)) {
             return back()->withInput($request->only('school_id'))->withErrors([
@@ -41,6 +49,15 @@ class AuthController extends Controller
             'status' => UserStatus::Activated->value,
         ], $request->boolean('remember'))) {
             $request->session()->regenerate();
+            $authenticatedUser = Auth::user();
+            ActivityLog::create([
+                'actor_id' => $authenticatedUser->id,
+                'action' => 'login',
+                'subject_type' => User::class,
+                'subject_id' => $authenticatedUser->id,
+                'subject_label' => $authenticatedUser->full_name,
+                'ip_address' => $request->ip(),
+            ]);
 
             return redirect()->intended(route('dashboard'));
         }

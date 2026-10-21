@@ -1,61 +1,19 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>SmartDoc | {{ $role->label() }} Dashboard</title>
-    <link rel="icon" type="image/png" href="{{ asset('images/logo.png') }}">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-    @vite('resources/css/app.css')
-</head>
-<body class="dashboard-page">
-    <aside class="sidebar">
-        <a class="brand" href="{{ route('dashboard') }}">
-            <img src="{{ asset('images/logo.png') }}" alt="Bulacan Polytechnic College">
-            <span class="brand-name">SmartDoc</span>
-            <span class="brand-caption">AI Document Request System</span>
+@extends('layouts.portal')
+
+@section('title', $role->label().' dashboard')
+@section('heading', $role->label().' dashboard')
+@section('subtitle', 'Welcome back, '.($user->firstname ?: $user->full_name).'. Here is your latest overview.')
+
+@section('content')
+
+        <a class="assistant-shortcut" href="{{ route('chatbot.index') }}">
+            <span class="assistant-shortcut-icon" aria-hidden="true">✦</span>
+            <span>
+                <strong>Need help with a document request?</strong>
+                <small>Ask the SmartDoc assistant about fees, requirements, and procedures.</small>
+            </span>
+            <span class="assistant-shortcut-action">Ask a question&nbsp; →</span>
         </a>
-
-        <nav class="side-nav" aria-label="Main navigation">
-            <a class="nav-link active" href="{{ route('dashboard') }}" aria-current="page">
-                <span class="nav-icon" aria-hidden="true">⌂</span>Dashboard
-            </a>
-            <a class="nav-link" href="#requests">
-                <span class="nav-icon" aria-hidden="true">▤</span>
-                {{ $role === \App\Enums\Role::Student ? 'My requests' : 'Request queue' }}
-            </a>
-            <a class="nav-link" href="#announcements">
-                <span class="nav-icon" aria-hidden="true">◉</span>Announcements
-            </a>
-        </nav>
-
-        <div class="sidebar-bottom">
-            <div class="sidebar-user">
-                <span class="avatar">{{ mb_strtoupper(mb_substr($user->firstname ?: $user->full_name, 0, 1)) }}</span>
-                <span class="sidebar-user-copy">
-                    <strong>{{ $user->full_name }}</strong>
-                    <small>{{ $role->label() }}</small>
-                </span>
-            </div>
-            <form method="POST" action="{{ route('logout') }}">
-                @csrf
-                <button class="logout-button" type="submit">Log out</button>
-            </form>
-        </div>
-    </aside>
-
-    <main class="main-content">
-        <header class="page-header">
-            <div>
-                <p class="eyebrow">SMARTDOC PORTAL</p>
-                <h1>{{ $role->label() }} dashboard</h1>
-                <p class="page-subtitle">Welcome back, {{ $user->firstname ?: $user->full_name }}. Here’s your latest overview.</p>
-            </div>
-            <div class="header-date">{{ now()->format('l, F j, Y') }}</div>
-        </header>
 
         @if ($role === \App\Enums\Role::Admin)
             <section class="stats-grid admin-stats" aria-label="System overview">
@@ -184,13 +142,13 @@
                 </div>
 
                 @forelse ($announcements as $announcement)
-                    <article class="announcement-item">
+                    <article class="announcement-item" id="announcement-{{ $announcement->id }}">
                         <div class="announcement-date">
                             {{ $announcement->published_at?->format('M j') ?? 'Update' }}
                         </div>
                         <div>
                             <h3>{{ $announcement->title }}</h3>
-                            <p>{{ \Illuminate\Support\Str::limit(strip_tags($announcement->message), 130) }}</p>
+                            <p>{{ \Illuminate\Support\Str::limit(strip_tags($announcement->message), 130) }} <a class="announcement-view-link" href="{{ route('announcements.index') }}#announcement-{{ $announcement->id }}">View announcement</a></p>
                         </div>
                     </article>
                 @empty
@@ -201,8 +159,4 @@
                 @endforelse
             </section>
         </div>
-
-        <footer class="page-footer">SmartDoc <span>·</span> Bulacan Polytechnic College</footer>
-    </main>
-</body>
-</html>
+@endsection

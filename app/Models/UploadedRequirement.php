@@ -9,7 +9,8 @@ class UploadedRequirement extends Model
 {
     protected $fillable = [
         'document_request_id', 'document_requirement_id',
-        'original_name', 'path', 'is_verified',
+        'original_name', 'path', 'is_verified', 'verification_remarks',
+        'ai_review_status', 'ai_review_remarks',
     ];
 
     protected $casts = ['is_verified' => 'boolean'];

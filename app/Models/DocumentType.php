@@ -2,18 +2,21 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\ArchivesRecords;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class DocumentType extends Model
 {
+    use ArchivesRecords;
+
     protected $fillable = ['name', 'description', 'processing_days', 'fee', 'is_active'];
 
     protected $casts = [
-            'processing_days' => 'integer',
-            'fee' => 'decimal:2',
-            'is_active' => 'boolean',
-        ];
+        'processing_days' => 'integer',
+        'fee' => 'decimal:2',
+        'is_active' => 'boolean',
+    ];
 
     public function requirements(): HasMany
     {
@@ -27,6 +30,6 @@ class DocumentType extends Model
 
     public function scopeActive($query)
     {
-        return $query->where('is_active', true)->orderBy('name');
+        return $query->unarchived()->where('is_active', true)->orderBy('name');
     }
 }

@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\ArchivesRecords;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Department extends Model
 {
+    use ArchivesRecords;
+
     protected $fillable = ['code', 'name', 'status'];
 
     public function users(): HasMany
@@ -16,6 +19,6 @@ class Department extends Model
 
     public function scopeActive($query)
     {
-        return $query->where('status', 'active')->orderBy('id');
+        return $query->unarchived()->where('status', 'active')->orderBy('id');
     }
 }

@@ -78,4 +78,9 @@ class DocumentRequest extends Model
     {
         return $this->hasMany(UploadedRequirement::class);
     }
+
+    public function history(): HasMany
+    {
+        return $this->hasMany(DocumentRequestHistory::class)->latest();
+    }
 }
